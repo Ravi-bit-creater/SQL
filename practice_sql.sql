@@ -44,3 +44,55 @@ FROM customertransactions
 GROUP BY login_device
 HAVING sum(amount) > 80000;
 
+CREATE TABLE CustomerData (
+    id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    email VARCHAR(100),
+    phone_number VARCHAR(15),
+    address VARCHAR(200),
+    amount DECIMAL(10, 2)
+);
+
+INSERT INTO CustomerData VALUES
+(1, 'Ravi', 'ravi@example.com', '98765', 'Chennai', 5000.00),
+(2, 'Priya', NULL, '98765', 'Bangalore', NULL),
+(3, 'Arjun', 'arjun@example.com', NULL, 'Hyderabad', 1500.00),
+(4, 'Meena', NULL, NULL, 'Mumbai', 2500.00),
+(5, 'Karthik', 'karthik@example.com', '98765', NULL, 3000.00);
+
+SELECT * FROM customerdata;
+
+SELECT customer_name, amount, 
+CASE
+WHEN amount > 4000 THEN 'Highest Spender'
+WHEN amount BETWEEN 2000 AND 4000 THEN 'Medium Spender'
+WHEN amount <= 2000 THEN 'Low Spender'
+ELSE 'No Data'
+END as spending
+FROM customerdata;
+
+SELECT customer_name, amount, 
+CASE
+ when email is null and phone_number is null then '9999'  -- ordering matters
+    when email is null  then phone_number
+    else email
+END as Contaxct
+FROM customerdata;
+
+SELECT count(*) AS null_values
+FROM customerdata
+WHERE phone_number IS NULL;
+
+SELECT count(*) AS null_values
+FROM customerdata
+WHERE phone_number IS NOT NULL;
+
+SELECT customer_name, email, phone_number
+FROM customerdata
+WHERE email IS NULL OR
+phone_number is NULL OR
+address IS NULL;
+
+SELECT customer_name, COALESCE(amount, '00.0') 
+AS adjust_amount FROM customerdata; 
+

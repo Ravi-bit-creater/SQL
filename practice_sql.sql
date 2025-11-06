@@ -96,3 +96,19 @@ address IS NULL;
 SELECT customer_name, COALESCE(amount, '00.0') 
 AS adjust_amount FROM customerdata; 
 
+SELECT
+length(customer_name) as length_of_customername,
+upper(customer_name) as upper_customername,
+lower(customer_name) as lower_customername,
+concat(customer_name,'-', address,'-','TN') as combined,
+substring(customer_name, 1,3) as sub_string,
+trim('    chennai   ') as trimed,
+lpad(customer_name, 10, '*') as left_pad,
+rpad(customer_name, 10, '*') as rightpad,
+REVERSE(customer_name) as reverse_name,
+REPLACE(email,'@',"&") as replaced,
+instr(customer_name, 'a') as position_of_a,
+RIGHT(customer_name, 2) as last_2_character,
+left(customer_name,2) as firts_2_character,
+FORMAT(9387878787,2) as formatting
+FROM customerdata;

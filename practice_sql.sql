@@ -112,3 +112,33 @@ RIGHT(customer_name, 2) as last_2_character,
 left(customer_name,2) as firts_2_character,
 FORMAT(9387878787,2) as formatting
 FROM customerdata;
+
+CREATE TABLE orders (
+    order_id INT,
+    customer_id INT PRIMARY KEY,
+    order_date DATE,
+    order_amount DECIMAL(10,2));
+
+INSERT INTO orders (order_id, customer_id, order_date, order_amount)
+VALUES
+(101, 1, '2025-11-01', 2500.00),
+(102, 2, '2025-11-02', 1800.50),
+(103, 3, '2025-11-03', 3200.75),
+(104, 4, '2025-11-04', 1500.00),
+(105, 5, '2025-11-05', 2750.25),
+(106, 6, '2025-11-06', 1999.99);
+
+CREATE TABLE customer (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    city VARCHAR(100),
+    FOREIGN KEY (customer_id) references orders(customer_id)
+);
+
+INSERT INTO customer (customer_id, customer_name, city)
+VALUES
+(1, 'Ravi Kumar', 'Coimbatore'),
+(2, 'Anjali Sharma', 'Chennai'),
+(3, 'Vikram Rao', 'Bangalore'),
+(4, 'Meena Devi', 'Madurai'),
+(5, 'Suresh Babu', 'Salem');

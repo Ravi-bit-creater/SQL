@@ -142,3 +142,116 @@ VALUES
 (3, 'Vikram Rao', 'Bangalore'),
 (4, 'Meena Devi', 'Madurai'),
 (5, 'Suresh Babu', 'Salem');
+
+SELECT customer_name,
+(SELECT max(order_amount)FROM orders) as max_order_amount
+FROM customer;
+
+SELECT customer_name FROM customer
+WHERE customer_id IN (
+    SELECT customer_id FROM orders WHERE order_amount > 2000
+);
+
+SELECT customer_name,
+(SELECT max(order_amount)FROM orders) as max_order_amount
+FROM customer;
+
+SELECT customer_name 
+FROM customer
+WHERE customer_id IN 
+(SELECT customer_id FROM orders
+WHERE order_amount > 2000);
+
+SELECT customer_name
+FROM customer
+WHERE EXISTS(
+    SELECT 1 FROM orders
+    where 
+    orders.customer_id = customer.customer_id AND
+    order_date >= CURRENT_DATE - INTERVAL 30 day
+);
+
+SELECT customer_name, city,
+(SELECT sum(order_amount) FROM orders o 
+where o.customer_id = c.customer_id) as total_orders
+FROM customer c;
+
+SELECT customer_name, city,CASE
+when (SELECT sum(order_amount) FROM orders where
+orders.customer_id = customer.customer_id) > 
+(SELECT avg(order_amount) FROM orders) THEN 'Above Average'
+ELSE 'Below Average'
+END as order_category
+FROM customer;
+
+SELECT customer_name, (
+    SELECT max(order_amount) from orders where
+    order_amount < (SELECT max(order_amount) from orders) )as second_highest_order
+from customer;
+
+-- Create the Employees table
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    FirstName  VARCHAR(50),
+    LastName   VARCHAR(50),
+    Salary     DECIMAL(10,2),
+    Department VARCHAR(50)
+);
+
+-- Insert sample data into the Employees table
+INSERT INTO Employees (EmployeeID, FirstName, LastName, Salary, Department)
+VALUES
+    (1, 'Alice', 'Johnson', 55000.00, 'Sales'),
+    (2, 'Bob',   'Smith',   60000.00, 'IT'),
+    (3, 'Carol', 'Davis',   52000.00, 'Sales'),
+    (4, 'Dave',  'Wilson',  58000.00, 'HR');
+
+CREATE view sales_department AS
+SELECT FirstName, LastName, Salary from Employees where Department = 'Sales';
+
+SELECT * from sales_department;
+
+DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS Orders;
+DROP TABLE IF EXISTS Restaurants;
+
+CREATE TABLE Restaurants (
+    id INT  PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    location VARCHAR(100) NOT NULL
+);
+
+INSERT INTO Restaurants (id, name, location) VALUES
+(1, 'ABC Bistro', 'New York'),
+(2, 'The Foodie', 'Los Angeles'),
+(3, 'Tasty Treat', 'Chicago');
+
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY,
+    restaurant_id INT NOT NULL,
+    order_date DATE NOT NULL
+);
+
+INSERT INTO Orders (order_id,restaurant_id, order_date) VALUES
+(1, 1, '2023-01-01'),
+(2, 1, '2023-01-02'),
+(3, 2, '2023-01-05'),
+(4, 4, '2023-01-07');  
+
+SELECT 
+r.name, o.order_date
+from Restaurants r 
+join Orders o on 
+r.id = o.restaurant_id;
+
+SELECT 
+r.name, o.order_date
+from Restaurants r 
+left join Orders o on 
+r.id = o.restaurant_id;
+
+SELECT 
+r.name, o.order_date
+from Restaurants r 
+right join Orders o on 
+r.id = o.restaurant_id;

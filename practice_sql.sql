@@ -504,3 +504,69 @@ SELECT EmployeeID, EmployeeName, Salary,
        NTH_VALUE(Salary, 2) OVER (PARTITION BY EmployeeID ORDER BY year
        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ThirdSalary
 FROM EmployeeSalaries;
+
+DROP TABLE IF EXISTS employees;
+DROP TABLE IF EXISTS contractors;
+CREATE TABLE employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name  VARCHAR(50),
+    last_name   VARCHAR(50),
+    position    VARCHAR(50),
+    salary      DECIMAL(10,2)
+);
+
+CREATE TABLE contractors (
+    contractor_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name    VARCHAR(50),
+    last_name     VARCHAR(50),
+    position      VARCHAR(50),
+    hourly_rate   DECIMAL(10,2)
+);
+
+
+INSERT INTO employees (first_name, last_name, position, salary)
+VALUES
+('Alice', 'Smith', 'Developer', 70000.00),
+('Bob', 'Johnson', 'Developer', 75000.00),
+('Charlie', 'Lee', 'Manager', 90000.00);
+
+INSERT INTO contractors (first_name, last_name, position, hourly_rate)
+VALUES
+('Dave', 'Williams', 'Developer', 40.00),
+('Eve', 'Brown', 'Tester', 35.00),
+('Bob', 'Johnson', 'Developer', 45.00);
+
+select first_name, last_name, position from employees
+UNION all
+select first_name, last_name, position from contractors;
+
+DROP TABLE IF EXISTS customers;
+
+CREATE TABLE customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name  VARCHAR(50) NOT NULL,
+    last_name   VARCHAR(50) NOT NULL,
+    email       VARCHAR(100) NOT NULL,
+    city        VARCHAR(100) NOT NULL
+);
+
+CREATE index idx_email on customers(email);
+
+INSERT INTO customers (first_name, last_name, email, city)
+VALUES
+('John', 'Doe', 'john@example.com', 'New York'),
+('Jane', 'Smith', 'jane.smith@example.com', 'Los Angeles'),
+('Michael', 'Brown', 'michael.brown@example.com', 'Chicago'),
+('Emily', 'Johnson', 'emily.johnson@example.com', 'Houston'),
+('Robert', 'Green', 'robert.green@example.com', 'Phoenix');
+
+select * from customers where email = "john@example.com";
+
+explain
+select * from customers where email = "john@example.com";
+
+explain analyze
+select * from customers where email = "john@example.com";
+
+explain format = json
+select * from customers where email = "john@example.com";

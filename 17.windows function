@@ -1,3 +1,7 @@
+A window Function in a SQL performs a calculations accross a set of rows related to the current rows
+without changing the number of rows in the resulted set
+The term "window" refers to the set of rows that are somehow related to the current row
+
 window Function 
 ----------------
 CREATE TABLE Sales (

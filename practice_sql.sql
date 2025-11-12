@@ -699,3 +699,203 @@ VALUES
 SELECT *
 FROM orders
 WHERE order_date BETWEEN '2020-01-01' AND '2020-12-31';
+
+CREATE DATABASE IF NOT EXISTS datetime_vs_timestamp;
+USE datetime_vs_timestamp;
+
+DROP TABLE IF EXISTS demo_events;
+CREATE TABLE demo_events (
+    event_id INT AUTO_INCREMENT PRIMARY KEY,
+    event_name VARCHAR(100),
+    event_date DATETIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO demo_events (event_name, event_date)
+VALUES
+    ('New Year Celebration', '2025-01-01 00:00:00'),
+    ('Summer Fest', '2025-06-15 12:30:00');
+
+select * from demo_events;
+
+select event_id, event_name, event_date, year(event_date) as eventdate from demo_events;
+select event_id, event_name, event_date, month(event_date) as eventdate from demo_events;
+select event_id, event_name, event_date, day(event_date) as eventdate from demo_events;
+select event_id, event_name, event_date + INTERVAL 30 day as plus30days from demo_events;
+select event_id, event_name, event_date - INTERVAL 30 day as plus30days from demo_events;
+select event_id, event_name, event_date, date_format(event_date, '%W, %M, %e, %Y') as eventdate from demo_events;
+select event_id, event_name, event_date, date_format(event_date, '%h:%i %p') as eventdate from demo_events;
+
+DROP TABLE IF EXISTS regex_samples;
+CREATE TABLE regex_samples (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sample_text VARCHAR(100)
+);
+
+INSERT INTO regex_samples (sample_text) VALUES 
+('apple'),         -- id=1
+('Banana'),        -- id=2 (note the capital B)
+('cherry'),        -- id=3
+('date'),          -- id=4
+('elderberry'),    -- id=5
+('fig'),           -- id=6
+('grape'),         -- id=7
+('honeydew'),      -- id=8
+('running'),       -- id=9 (ends with "ing")
+('123abc');        -- id=10 (starts with digits)
+
+select * from regex_samples
+where sample_text regexp '^a';
+
+select * from regex_samples
+where sample_text regexp 'e$';
+
+select * from regex_samples
+where sample_text regexp '^[0-9]';
+
+select * from regex_samples
+where sample_text regexp 'ing$';
+
+select * from regex_samples
+where sample_text regexp '(.)\\1';
+
+select * from regex_samples
+where sample_text regexp '^[A-Za-z]+$';
+
+select * from regex_samples
+where sample_text regexp '.{5}$';
+
+select * from regex_samples
+where sample_text regexp '^[A-Z]';
+
+select * from regex_samples
+where sample_text regexp '^(apple|banana)';
+
+select * from regex_samples
+where sample_text regexp '^[0-9]{3}[A-Za-z]+$';
+
+CREATE TABLE demo_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(50),
+    phone VARCHAR(25),
+    email VARCHAR(100),
+    date_col VARCHAR(10),   -- Storing as VARCHAR for the demo
+    status VARCHAR(20),
+    sku VARCHAR(20),
+    username VARCHAR(30),
+    notes VARCHAR(100)
+);
+
+
+INSERT INTO demo_data (full_name, phone, email, date_col, status, sku, username, notes)
+VALUES
+-- 1
+('John Smith', 
+ '123-456-7890', 
+ 'john@example.com', 
+ '2025-02-07', 
+ 'pending', 
+ 'ABCD', 
+ 'johnsmith', 
+ 'Ships to CA'),
+
+-- 2
+('Alice Johnson', 
+ '(987) 654-3210', 
+ 'alice@@example.net', 
+ '2025-02-07', 
+ 'inactive', 
+ 'SKU-123', 
+ 'alice', 
+ 'NY location'),
+
+-- 3
+('Bob Williams', 
+ '+1-555-123-4567', 
+ 'bob@sample.org', 
+ '20250207', 
+ 'complete', 
+ '1SKU', 
+ 'bob123', 
+ 'Shipping to CA'),
+
+-- 4
+('Mary 1 White', 
+ '(123) 123-4567', 
+ 'mary123@example.com', 
+ '2025-13-31', 
+ 'PENDING', 
+ 'abc-999', 
+ 'mary_white', 
+ 'Something about CA or'),
+
+-- 5
+('Mark-Spencer', 
+ '1234567890', 
+ 'mark@example.com', 
+ '2024-11-02', 
+ 'active', 
+ 'SKU-9999', 
+ 'mark', 
+ 'Random note'),
+
+-- 6
+('Jane O''Connor',   -- Note the doubled apostrophe for SQL
+ '987-654-3210', 
+ 'jane.o.connor@example.org', 
+ '2024-12-31', 
+ 'inactive', 
+ 'ABCDE', 
+ 'janeO', 
+ 'Contains CA or NY'),
+
+-- 7
+('Invalid Mail', 
+ '000-000-0000', 
+ 'invalid@@example..com', 
+ '2023-01-15', 
+ 'inactive', 
+ 'XYZ000', 
+ 'invalid', 
+ 'Double @ and dots'),
+
+-- 8
+('NoSpacesHere', 
+ '+12-345-678-9012',
+ 'nospaces@example.co',
+ '2025-02-07',
+ 'pending',
+ 'SKU999',
+ 'NoSpaces',
+ 'Ends with .co domain');
+
+
+select * from demo_data 
+where date_col regexp '^[0-9]{4}-[0-9]{2}-[0-9]{2}$';
+
+SELECT *
+FROM demo_data
+WHERE full_name REGEXP '^[A-Za-z ]+$';
+
+CREATE TABLE Accounts (
+  AccountID INT PRIMARY KEY,
+  AccountHolder VARCHAR(100),
+  Balance DECIMAL(10,2)
+);
+
+INSERT INTO Accounts (AccountID, AccountHolder, Balance)
+VALUES (1, 'Alice', 5000.00);
+
+CREATE USER 'jane_doe'@'localhost' IDENTIFIED BY 'StrongP@ssw0rd';
+
+grant select, insert on test.* to 'jane_doe'@'localhost';
+
+FLUSH PRIVILEGES;
+
+select user, host  from mysql.user;
+
+REVOKE SELECT, INSERT ON test.* FROM 'jane_doe'@'localhost';
+FLUSH PRIVILEGES;
+show tables;
+select * from accounts;
+select * from demo_data;

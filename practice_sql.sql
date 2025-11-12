@@ -570,3 +570,132 @@ select * from customers where email = "john@example.com";
 
 explain format = json
 select * from customers where email = "john@example.com";
+
+create database test;
+use test;
+DROP TABLE IF EXISTS orders;
+
+CREATE TABLE orders (
+    order_id   INT AUTO_INCREMENT ,
+    order_date DATE NOT NULL, 
+    customer_name VARCHAR(50),
+    amount     DECIMAL(10,2),
+PRIMARY KEY(order_id, order_date)
+)
+PARTITION BY RANGE (YEAR(order_date)) (
+    PARTITION p_before_2020 VALUES LESS THAN (2020),
+    PARTITION p_2020       VALUES LESS THAN (2021),
+    PARTITION p_2021       VALUES LESS THAN (2022),
+    PARTITION p_2022       VALUES LESS THAN (2023),
+    PARTITION p_future     VALUES LESS THAN MAXVALUE
+);
+
+INSERT INTO orders (order_date, customer_name, amount)
+VALUES
+('2019-05-10', 'Alice', 100.00),
+('2020-01-15', 'Bob', 200.50),
+('2020-12-01', 'Charlie', 300.00),
+('2021-07-20', 'Diana', 150.75),
+('2022-03-02', 'Edward', 500.00),
+('2025-06-18', 'FutureMan', 9999.99);
+
+select * from orders;
+
+show create table orders;
+
+SELECT 
+    PARTITION_NAME,
+    PARTITION_METHOD,
+    PARTITION_EXPRESSION,
+    SUBPARTITION_METHOD,
+    SUBPARTITION_EXPRESSION
+FROM information_schema.PARTITIONS
+WHERE TABLE_SCHEMA = 'test'
+  AND TABLE_NAME   = 'orders';
+
+select * from orders where order_date = 2020;
+
+explain format = json
+select * from orders where order_date = 2021;
+
+DROP TABLE IF EXISTS employees;
+
+CREATE TABLE employees (
+    employee_id INT AUTO_INCREMENT,
+    first_name  VARCHAR(50),
+    last_name   VARCHAR(50),
+    department  VARCHAR(50),
+    primary key (employee_id,department)
+)
+PARTITION BY LIST COLUMNS (department) (
+    PARTITION p_sales       VALUES IN ('Sales'),
+    PARTITION p_hr          VALUES IN ('HR'),
+    PARTITION p_engineering VALUES IN ('Engineering', 'DevOps'),
+    PARTITION p_other       VALUES IN ('Finance', 'Marketing', 'Operations')
+);
+
+
+INSERT INTO employees (first_name, last_name, department)
+VALUES
+('Alice', 'Smith', 'Sales'),
+('Bob', 'Johnson', 'HR'),
+('Charlie', 'Lee', 'Engineering'),
+('Diana', 'Lopez', 'DevOps'),
+('Eve', 'Turner', 'Marketing');
+
+select * from employees where department='sales';
+
+DROP TABLE IF EXISTS sensor_data;
+
+CREATE TABLE sensor_data (
+    sensor_id     INT NOT NULL,
+    reading_time  DATETIME NOT NULL,
+    reading_value DECIMAL(10,2),
+    PRIMARY KEY (sensor_id, reading_time)
+)
+PARTITION BY HASH(sensor_id)
+PARTITIONS 2;
+
+INSERT INTO sensor_data (sensor_id, reading_time, reading_value)
+VALUES
+(101, '2025-01-01 10:00:00', 23.50),
+(102, '2025-01-01 10:05:00', 24.10),
+(103, '2025-01-01 10:10:00', 22.75),
+(104, '2025-01-01 10:15:00', 25.00),
+(105, '2025-01-01 10:20:00', 20.00),
+(106, '2025-01-01 10:25:00', 21.60);
+
+explain format=json
+select * from sensor_data where sensor_id=102;
+
+DROP TABLE IF EXISTS orders;
+
+CREATE TABLE orders (
+    order_id      INT AUTO_INCREMENT ,
+    order_date    DATE NOT NULL,
+    customer_name VARCHAR(50),
+    amount        DECIMAL(10,2),
+    primary key(order_id, order_date)
+)
+PARTITION by RANGE (YEAR(order_date))(
+    PARTITION p_before_2020 VALUES LESS than    (2020),
+    partition p_2020 values less than (2021),
+    partition p_2021 values less than (2022),
+    partition p_2022 values less than (2023),
+    partition p_future values less than MAXVALUE
+);
+
+create index idx_order_date on orders(order_date);
+
+INSERT INTO orders (order_date, customer_name, amount)
+VALUES
+('2019-05-10', 'Alice', 100.00),
+('2020-01-15', 'Bob', 200.50),
+('2020-12-01', 'Charlie', 300.00),
+('2021-07-20', 'Diana', 150.75),
+('2022-03-02', 'Edward', 500.00),
+('2025-06-18', 'FutureMan', 9999.99);
+
+SELECT *
+FROM orders
+WHERE order_date BETWEEN '2020-01-01' AND '2020-12-31';

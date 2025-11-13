@@ -899,3 +899,184 @@ FLUSH PRIVILEGES;
 show tables;
 select * from accounts;
 select * from demo_data;
+
+CREATE TABLE Students_Non1NF (
+    student_id   INT,
+    student_name VARCHAR(100),
+    phone_numbers VARCHAR(100) 
+);
+
+INSERT INTO Students_Non1NF (student_id, student_name, phone_numbers)
+VALUES (1, 'Alice', '123-4567,987-6543'),
+       (2, 'Bob', '555-1212');
+
+DROP TABLE students;
+CREATE TABLE students(
+    student_id INT PRIMARY KEY,
+    student_name VARCHAR(50)
+);
+
+CREATE TABLE studentphones(
+    student_id INT,
+    phone VARCHAR(30),
+    PRIMARY KEY (student_id, phone),
+    FOREIGN KEY (student_id) references Students(students_id)
+);
+
+-- Insert students
+INSERT INTO Students (student_id, student_name)
+VALUES (1, 'Alice'),
+       (2, 'Bob');
+
+-- Insert phone numbers (each phone number in its own row)
+INSERT INTO StudentPhones (student_id, phone)
+VALUES (1, '123-4567'),
+       (1, '987-6543'),
+       (2, '555-1212');
+
+-- This table is in 1NF but not in 2NF because course details depend only on course_id.
+CREATE TABLE Enrollment_Non2NF (
+    student_id  INT,
+    course_id   INT,
+    course_name VARCHAR(100),
+    instructor  VARCHAR(100),
+    PRIMARY KEY (student_id, course_id)
+);
+
+-- Sample data insertion
+INSERT INTO Enrollment_Non2NF (student_id, course_id, course_name, instructor)
+VALUES (1, 101, 'Intro to SQL', 'Dr. Smith'),
+       (2, 101, 'Intro to SQL', 'Dr. Smith'),
+       (1, 102, 'Database Design', 'Dr. Jones');
+
+-- Table recording enrollments (relationship)
+CREATE TABLE Enrollment (
+    student_id INT,
+    course_id  INT,
+    PRIMARY KEY (student_id, course_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+);
+
+-- Table holding course details
+CREATE TABLE Courses (
+    course_id   INT PRIMARY KEY,
+    course_name VARCHAR(100),
+    instructor  VARCHAR(100)
+);
+
+
+-- Insert course details
+INSERT INTO Courses (course_id, course_name, instructor)
+VALUES (101, 'Intro to SQL', 'Dr. Smith'),
+       (102, 'Database Design', 'Dr. Jones');
+
+-- Insert enrollment data
+INSERT INTO Enrollment (student_id, course_id)
+VALUES (1, 101),
+       (2, 101),
+       (1, 102);
+
+CREATE TABLE Courses_Non3NF (
+    course_id        INT PRIMARY KEY,
+    course_name      VARCHAR(100),
+    instructor       VARCHAR(100),
+    instructor_office VARCHAR(100)
+);
+
+-- Sample data insertion
+INSERT INTO Courses_Non3NF (course_id, course_name, instructor, instructor_office)
+VALUES (101, 'Intro to SQL', 'Dr. Smith', 'Room 101'),
+       (102, 'Database Design', 'Dr. Jones', 'Room 102');
+
+CREATE TABLE Courses (
+    course_id   INT PRIMARY KEY,
+    course_name VARCHAR(100),
+    instructor  VARCHAR(100),
+    FOREIGN KEY (instructor) REFERENCES Instructors(instructor)
+);
+
+-- New table for instructor details
+CREATE TABLE Instructors (
+    instructor       VARCHAR(100) PRIMARY KEY,
+    instructor_office VARCHAR(100)
+);
+
+INSERT INTO Instructors (instructor, instructor_office)
+VALUES ('Dr. Smith', 'Room 101'),
+       ('Dr. Jones', 'Room 102');
+
+-- Insert courses with reference to instructors
+INSERT INTO Courses (course_id, course_name, instructor)
+VALUES (101, 'Intro to SQL', 'Dr. Smith'),
+       (102, 'Database Design', 'Dr. Jones');
+
+CREATE TABLE dim_product_type1 (
+    product_id INT PRIMARY KEY,         
+    product_title VARCHAR(255),
+    category VARCHAR(100),
+    brand VARCHAR(100)
+);
+
+INSERT INTO dim_product_type1 (product_id, product_title, category, brand)
+VALUES (101, 'Amazon Echo Dot 3rd Gen', 'Smart Speakers', 'Amazon');
+
+select * from dim_product_type1
+
+UPDATE dim_product_type1
+SET product_title = 'Amazon Echo Dot (3rd Gen)'
+WHERE product_id = 101;
+
+select * from dim_product_type1
+
+CREATE TABLE dim_seller_type2 (
+    seller_key INT PRIMARY KEY,        
+    seller_id INT,                     
+    seller_name VARCHAR(255),
+    store_location VARCHAR(255),
+    effective_date DATE,               
+    end_date DATE,                     
+    is_current BOOLEAN                
+);
+
+INSERT INTO dim_seller_type2 (seller_key, seller_id, seller_name, store_location, effective_date, end_date, is_current)
+VALUES (1, 501, 'Best Sellers Inc.', 'Seattle, WA', '2022-01-01', NULL, TRUE);
+
+
+select * from dim_seller_type2;
+
+UPDATE dim_seller_type2
+SET end_date = '2023-01-15',
+    is_current = FALSE
+WHERE seller_id = 501 AND is_current = TRUE;
+
+
+select * from dim_seller_type2
+
+
+INSERT INTO dim_seller_type2 (seller_key, seller_id, seller_name, store_location, effective_date, end_date, is_current)
+VALUES (2, 501, 'Best Sellers Inc.', 'Los Angeles, CA', '2023-01-15', NULL, TRUE);
+
+
+select * from dim_seller_type2 where seller_id = 501
+
+
+CREATE TABLE dim_product_type3 (
+    product_id INT PRIMARY KEY,         
+    product_title VARCHAR(255),
+    current_category VARCHAR(100),
+    previous_category VARCHAR(100)       
+);
+
+INSERT INTO dim_product_type3 (product_id, product_title, current_category, previous_category)
+VALUES (201, 'Amazon Fire TV Stick', 'Streaming Devices', NULL);
+
+
+select * from dim_product_type3;
+
+UPDATE dim_product_type3
+SET previous_category = current_category,
+    current_category = 'Media Players'
+WHERE product_id = 201;
+
+
+select * from dim_product_type3;
